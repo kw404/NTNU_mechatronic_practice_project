@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- 下面是表達網頁的編碼 -->
+        <meta charset="UTF-8"/>
+        <meta name="description"    content="這是潘鈴聲的ESP32 CAM 遙控網站"/>
+        <meta name="author"         content="潘鈴聲"/>
+        <meta name="keywords"       content="潘鈴聲, arduino, ESP32 CAM, 教學"/>
+        <meta name="viewport"       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <title>潘鈴聲的ESP32 CAM遙控網站</title> 
+        <style>
+        /* 小記 接下來會用到 箭頭(arrows) 按鈕(botton) 滑桿(slider) 防網頁誤觸 */
+        /* 箭頭 */ 
+        .arrows {
+            font-size:30px;
+            color:rgb(0, 255, 255);
+        }
+        /* 按鈕 */
+        td.button {
+            background-color:rgb(50, 41, 41);
+            border-radius:25%;
+            box-shadow: 5px 5px #666161;
+        }
+        /* 按鈕啟動後動畫 */
+        td.button:active {
+            transform: translate(5px,5px);
+            box-shadow: none; 
+        }
+        /* 防止網頁被長按後跳出命令視窗 */
+        .noselect { 
+            -webkit-touch-callout:  none;   /* iOS Safari */
+            -webkit-user-select:    none;   /* Safari */
+            -khtml-user-select:     none;   /* Konqueror HTML */
+            -moz-user-select:       none;   /* Firefox */
+            -ms-user-select:        none;   /* Internet Explorer/Edge */
+            user-select:            none;   /* Non-prefixed version, currently supported by Chrome and Opera */                                       
+        }
+        /* 滑桿寬度 */
+        .slidecontainer {
+            width: 100%;                    /* 設置滑桿容器的寬度為100% */
+        }
+        /* 滑桿顯示的各項數值 */
+        .slider {
+            -webkit-appearance: none;       /* 使用自定義的樣式,不使用瀏覽器預設樣式 */
+            width: 100%;                    /* 設置滑桿的寬度為100% */
+            height: 15px;                   /* 設置滑桿的高度為15px */
+            border-radius: 5px;             /* 設置滑桿的邊框半徑為5px,呈現圓角的外觀 */
+            background: #d3d3d3;          /* 設置滑桿的背景為淺灰色 */
+            outline: none;                  /* 獲得焦點時不顯示外框線 */
+            opacity: 0.7;                   /* 設置滑桿的透明度為0.7 */
+            -webkit-transition: .2s;        /* 設置 WebKit 動畫的持續時間為0.2秒 */
+            transition: opacity .2s;        /* 設置滑桿透明度的動畫持續時間為0.2秒 */
+        }
+        /*當滑鼠移動到滑桿上時,透明度變為1*/
+        .slider:hover {
+            opacity: 1;
+        }
+        /* 因為slider在不同瀏覽器有不同的預設模式,所以針對webkit(google), 和firefox做分別處理 */
+        /* 設置 WebKit 樣式 */
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;       /* 不使用瀏覽器預設樣式 */
+            appearance: none;               /* 不使用瀏覽器預設樣式 */
+            width: 25px;                    /* 設置滑桿的寬度為25px */
+            height: 25px;                   /* 設置滑桿的高度為25px */
+            border-radius: 50%;             /* 設置滑桿的邊框半徑為50%,使其呈現圓形 */
+            background: rgb(212, 0, 255);              /* 設置滑桿的背景顏色為紅色 */
+            cursor: pointer;                /* 設置滑鼠游標顯示為指針,表示該元素可以被點擊或拖曳 */
+        }
+        /* 設置 Firefox 樣式 */
+        .slider::-moz-range-thumb {
+            width: 25px;                    /* 設置滑桿的寬度為25px */
+            height: 25px;                   /* 設置滑桿的高度為25px */
+            border-radius: 50%;             /* 設置滑桿的邊框半徑為50%,使其呈現圓形 */
+            background: rgb(255, 0, 179);              /* 設置滑桿的背景顏色為紅色 */
+            cursor: pointer;                /* 設置滑鼠游標顯示為指針,表示該元素可以被點擊或拖曳 */
+        }
+        </style>  
+    </head>
+    <!-- 整體架構排版 -->
+
+    <!-- 設定基礎背景樣式 -->
+    <body class="noselect" align="center" style="background-image: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwall.alphacoders.com%2Funregistered.php%3Fid%3D53671&psig=AOvVaw2Z6EFCaGuTmaP9QxnXhRoq&ust=1680851206331000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCOCSuurYlP4CFQAAAAAdAAAAABAE'); background-size: cover; background-position: top center; ">    
+
+        <!-- 主面板 -->
+        <table  id="mainTable" style=" width:400px; margin:auto; table-layout:fixed; background-color: rgba(128, 128, 128, 0.5);"  CELLSPACING=10>
+            <tr><!-- 鏡頭畫面 -->
+                <img id="cameraImage" src="" style="width:400px;height:250px"></td>
+            </tr> 
+            <!-- 接下來是按鈕頁面 按鈕被按下和離手後會觸發 sandButtonInput函式 輸入值為( 字串, 數值 ) 數值在define中的 wifi_define 都設定好了 -->
+            <tr><!-- 第一行按紐 -->
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","7")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8598;</span></td>
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","8")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8593;</span></td>
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","9")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8599;</span></td>
+            </tr>
+            <tr><!-- 第二行按紐 -->
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","4")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8592;</span></td>
+                <td class="button"></td>   
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","6")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8594;</span></td>
+            </tr>
+            <tr><!-- 第三行按紐 -->
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","1")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8601;</span></td>
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","2")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8595;</span></td>
+                <td class="button" ontouchstart='sendButtonInput("MoveCar","3")' ontouchend='sendButtonInput("MoveCar","5")'><span class="arrows" >&#8600;</span></td>
+            </tr>
+            <tr/><tr/>
+            <!-- 接下來是滑桿頁面 會觸發 sandButtonInput函式 輸入值為( 字串, 數值 ) -->
+            <tr><!-- 速度滑桿 -->
+                <td style="text-align:left; color: rgb(255, 255, 255);"><b>Speed:</b></td>
+                <td colspan=2>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="255" value="150" class="slider" id="Speed" oninput='sendButtonInput("Speed",value)'>
+                    </div>
+                </td>
+            </tr>        
+            <tr><!-- LED燈滑桿 -->
+                <td style="text-align:left; color: rgb(255, 255, 255);"><b>Light:</b></td>
+                <td colspan=2>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="255" value="0" class="slider" id="Light" oninput='sendButtonInput("Light",value)'>
+                    </div>
+                </td>   
+            </tr>
+            <tr><!-- 鏡頭底盤滑桿 -->
+                <td style="text-align:left; color: rgb(255, 255, 255);"><b>Pan:</b></td>
+                <td colspan=2>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="180" value="90" class="slider" id="Pan" oninput='sendButtonInput("Pan",value)'>
+                    </div>
+                </td>
+            </tr> 
+            <tr><!-- 鏡頭上盤滑桿 -->
+                <td style="text-align:left; color: rgb(255, 255, 255);"><b>Tilt:</b></td>
+                <td colspan=2>
+                    <div class="slidecontainer">
+                        <input type="range" min="0" max="180" value="90" class="slider" id="Tilt" oninput='sendButtonInput("Tilt",value)'>
+                    </div>
+                </td>   
+            </tr>      
+        </table>
+
+        <!-- 設定頁面採取的動作 -->
+        <script>
+            /* 建立websocket 溝通協定所需的變數 */
+            var webSocketCameraUrl = "ws:\/\/" + window.location.hostname + "/Camera";          /* 建立鏡頭url */
+            var webSocketCarInputUrl = "ws:\/\/" + window.location.hostname + "/CarInput";      /* 建立輸入指令的url */      
+            var websocketCamera;        /* 儲存鏡頭畫面 */
+            var websocketCarInput;      /* 儲存指令 */
+
+            /* 啟動鏡頭圖像websocket傳輸 */
+            function initCameraWebSocket() 
+            {
+                websocketCamera = new WebSocket(webSocketCameraUrl);            /* 將網路攝影機的畫面抓進畫面變數 */
+                websocketCamera.binaryType = 'blob';                            /* 畫面變數資料型態變更為 blob */
+                websocketCamera.onopen    = function(event){};                  /* 開啟協議的呼回 */
+                websocketCamera.onclose   = function(event){setTimeout(initCameraWebSocket, 2000);};        /* 協議斷線的呼回 */
+                websocketCamera.onmessage = function(event)                     /* 協議運作的呼回 */
+                {
+                    var imageId = document.getElementById("cameraImage");       /* 把網頁排板中的" cameraImage " 抓來賦予imageId的屬性 */
+                    imageId.src = URL.createObjectURL(event.data);              /* 設定imageId中的src屬性為此傳輸協議的data 也就是圖像 */
+                };
+            }
+            /* 啟動指令websocket傳輸 */
+            function initCarInputWebSocket() 
+            {
+                websocketCarInput = new WebSocket(webSocketCarInputUrl);        /* 將指令抓進畫面變數 */
+                websocketCarInput.onopen    = function(event)                   /* 開啟協議的呼回 */
+                {
+                    sendButtonInput("Speed", document.getElementById("Speed").value);       /* 開啟指令協議乎回時,以sendButtonInput為基礎開始傳輸數值 */
+                    sendButtonInput("Light", document.getElementById("Light").value);
+                    sendButtonInput("Pan",   document.getElementById("Pan").value);
+                    sendButtonInput("Tilt",  document.getElementById("Tilt").value);                    
+                };
+                websocketCarInput.onclose   = function(event){setTimeout(initCarInputWebSocket, 2000);};        /* 協議斷線的呼回 */
+                websocketCarInput.onmessage = function(event){};                /* 協議運作的呼回 */
+            }
+            /* 同時啟用上述兩個websocket溝通協定的函式 */
+            function initWebSocket() 
+            {
+                initCameraWebSocket ();
+                initCarInputWebSocket();
+            }
+             /* 設定按鈕傳輸函式 */
+            function sendButtonInput(key, value) 
+            {
+                var data = key + "," + value;
+                websocketCarInput.send(data);
+            }                        
+            window.onload = initWebSocket;      /* 畫面啟用時 同時啟用initWebSocket來啟動 websocket溝通協定的函式 */
+            document.getElementById("mainTable").addEventListener("touchend", function(event){
+                event.preventDefault()
+            });      
+        </script>
+
+    </body> 
+</html>

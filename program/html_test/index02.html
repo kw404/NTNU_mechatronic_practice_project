@@ -1,0 +1,104 @@
+<html>
+
+<head>
+    <style>
+        /* 定義 .myButton 樣式 */
+        .myButton {
+            /* 設置陰影樣式 */
+            box-shadow: inset 0px 1px 0px 0px #bbdaf7;
+            /* 設置背景漸變顏色 */
+            background: linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
+            /* 設置背景顏色 */
+            background-color: #79bbff;
+            /* 設置圓角半徑 */
+            border-radius: 6px;
+            /* 設置邊框樣式 */
+            border: 1px solid #84bbf3;
+            /* 設置元素顯示方式 */
+            display: inline-block;
+            /* 設置滑鼠指針顯示方式 */
+            cursor: pointer;
+            /* 設置文字顏色 */
+            color: #ffffff;
+            /* 設置字體 */
+            font-family: Arial;
+            /* 設置字體大小 */
+            font-size: 15px;
+            /* 設置字體粗細 */
+            font-weight: bold;
+            /* 設置內邊距 */
+            padding: 26px 59px;
+            /* 設置文字裝飾 */
+            text-decoration: none;
+            /* 設置文字陰影樣式 */
+            text-shadow: 0px 1px 0px #528ecc;
+        }
+
+        /* 定義 .myButton 滑鼠懸停時的樣式 */
+        .myButton:hover {
+            /* 改變背景漸變顏色的方向和背景顏色 */
+            background: linear-gradient(to bottom, #a1aebb 5%, #79bbff 100%);
+            background-color: #378de5;
+        }
+
+        /* 定義 .myButton 按下時的樣式 */
+        .myButton:active {
+            /* 改變按鈕位置 */
+            position: relative;
+            top: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 建立中心對齊的圖像元素 -->
+    <center>
+        <img id='img' class='img' width="320" height="240" crossorigin='anonymous' />
+        <script>
+            // 獲取圖像元素
+            var imageElement = document.getElementById('img');
+            // 設置圖像元素的來源為本地伺服器攝像頭串流
+            imageElement.src = 'http://' + window.location.hostname + ':81/stream';
+            // 宣告一個名為 video 的變數
+            let video;
+            // 宣告一個名為 httpGet 的函數，用於向伺服器發送 HTTP GET 請求
+            function httpGet(theUrl) {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open('GET', theUrl, false); // false 表示同步請求
+                xmlHttp.send(null);
+                return xmlHttp.responseText;
+            }
+            // 宣告一個名為 L 的函數，用於設置控制變量的值為 100
+            function L(str) {
+                httpGet('http://' + location.host + '/control?var=' + str + '&val=100')
+            }
+        </script>
+        <!-- 宣告圖像元素要置中對齊 -->
+    <center>
+        <table>
+            <tr>
+                <td></td>
+                <td>
+                    <a href="#" onclick="L('F');" class='myButton'>F</a>
+                </td>
+                <td></td>
+            <tr>
+                <td>
+                    <a href="#" onclick="L('L');" class='myButton'>L</a>
+                </td>
+                <td>
+                    <a href="#" onclick="L('S');" class='myButton'>S</a>
+                </td>
+                <td>
+                    <a href="#" onclick="L('R');" class='myButton'>R</a>
+                </td>
+            <tr>
+                <td>
+                <td>
+                    <a href='#' onclick="L('B');" class='myButton'>B</a>
+                </td>
+                <td></td>
+        </table>
+</body>
+
+</html>
