@@ -504,7 +504,7 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "機電整合.step",
       "vrml": ""
     },
     "page_layout_descr_file": ""
