@@ -23,15 +23,17 @@
 #define motor_6_A     10
 #define motor_6_A     11
 
-#define STOP                0
-#define FOWARD              1
-#define FOWARD_RIGHT        2
-#define RIGHT               3
-#define BACKWARD_RIGHT      4
-#define BACKWARD            5
-#define BACKWARD_LEFT       6
-#define LEFT                7
-#define FOWARD_LEFT         8
+#define STOP                 0
+#define FORWARD              1
+#define FORWARD_RIGHT        2
+#define RIGHT                3
+#define BACKWARD_RIGHT       4
+#define BACKWARD             5
+#define BACKWARD_LEFT        6
+#define LEFT                 7
+#define FORWARD_LEFT         8
+#define TRUN_RIGHT           9
+#define TRUN_LEFT           10
 
 #define clockwise         1
 #define counterclockwise  2
@@ -47,6 +49,8 @@ int  count=0;
 int carsignal,motor_5_signal,motor_6_signal;
 int moveway[9]= { B00000000,
                   B10101010,
+                  B00000000,
+                  B00000000,
                   B00000000,
                   B00000000,
                   B00000000,
@@ -69,6 +73,7 @@ void signal_load_595(){
   shiftOut(DATA_595, CLK_595, LSBFIRST, motor_5_signal*64+motor_6_signal*16);
   shiftOut(DATA_595, CLK_595, LSBFIRST, carsignal);
   digitalWrite(LATCH_595, HIGH);
+  carsignal = 0;
 }
 
 void carmove_signal(int direction, int motor_speed){
@@ -121,38 +126,49 @@ void loop(){
     if(Serial.available()!= 0){ val = Serial.read(); }
     
     if(Wire.available() != 0){ val = Wire.read(); }
-    
+
     switch(val){
       case 'I' :
       case 'i' :
+        carmove_signal(FORWARD,1023);
         break;
       case 'L' :
       case 'l' :
+        carmove_signal(RIGHT,1023);
         break;
       case 'J':
       case 'j':
+        carmove_signal(LEFT,1023);
         break;
       case ',':
+        carmove_signal(BACKWARD,1023);
         break;  
       case 'K':    
       case 'k':
+        carmove_signal(STOP,1023);
         break;
       case 'O':    
       case 'o':
+        carmove_signal(FORWARD_RIGHT,1023);
         break;
       case 'U':    
       case 'u':
+        carmove_signal(FORWARD_LEFT,1023);
         break;
-      case '.':    
+      case '.':
+        carmove_signal(BACKWARD_RIGHT,1023);
         break;        
       case 'M':    
       case 'm':
+        carmove_signal(BACKWARD_LEFT,1023);
         break;
       case 'A':    
       case 'a':
+        carmove_signal(TRUN_RIGHT,1023);
         break;
-      case 'D':    
+      case 'D':
       case 'd':
+        carmove_signal(TRUN_LEFT,1023);
         break;
         
       case 'T':    
@@ -162,7 +178,8 @@ void loop(){
       default:
         break;
     }
+
+    signal_load_595();
+
   }
-  carmove_signal(FOWARD,1023);
-  signal_load_595();
 }
