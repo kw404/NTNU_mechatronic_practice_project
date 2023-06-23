@@ -47,7 +47,7 @@ char val ;
 int  count=0;
 
 int carsignal,motor_5_signal,motor_6_signal;
-int moveway[9]= { B00000000,
+int moveway[11]= { B00000000,
                   B10101010,
                   B10000010,
                   B10010110,
@@ -55,7 +55,9 @@ int moveway[9]= { B00000000,
                   B01010101,
                   B01000001,
                   B01101001,
-                  B01000001
+                  B01000001,
+                  B10011001,
+                  B01100110
                 };
 int pingpong_state[3]{  B10,
                         B01,
@@ -79,21 +81,16 @@ void carmove_signal(int direction, int motor_speed){
   analogWrite(wheel_speed_pin ,motor_speed);
 }
 
-void pingpong_shit(int state, int speed){
+void pingpong_shit(int state, byte speed_1){
   motor_5_signal = pingpong_state[state];
-  analogWrite(pingpong_speed_pin,speed);
-}
-
-void motor6(int state, int speed){
-  motor_6_signal = motor6_state[state];
-  analogWrite(motor6_speed_pin,speed);
+  analogWrite(10,255);
 }
 
 void print_mainMenu(){
   char print_sim_joycontroler[3][3]={
-    'u', 'i', 'o',
-    'j', 'k', 'l',
-    'm', ',', '.'
+    'q', 'w', 'e',
+    'a', 'k', 'd',
+    'z', 's', 'c'
   };
   Serial.println(" ");
   Serial.println("//////////////////////////////////");
@@ -112,7 +109,7 @@ void print_mainMenu(){
   Serial.print("Please enter your instruction: ");
 }
 
-=======
+
 /////////////////////////////////////i2c函式//////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
@@ -131,7 +128,7 @@ void setup(){
   Serial.println("START"); 
 }
 void loop(){
-<<<<<<< Updated upstream
+
   print_mainMenu();
   while(1){
     if(Serial.available()!= 0){ val = Serial.read(); }
@@ -139,53 +136,56 @@ void loop(){
     if(Wire.available() != 0){ val = Wire.read(); }
 
     switch(val){
-      case 'I' :
-      case 'i' :
+      case 'W' :
+      case 'w' :
         carmove_signal(FORWARD,1023);
         break;
-      case 'L' :
-      case 'l' :
+      case 'A' :
+      case 'a' :
         carmove_signal(RIGHT,1023);
         break;
-      case 'J':
-      case 'j':
+      case 'd':
+      case 'D':
         carmove_signal(LEFT,1023);
         break;
-      case ',':
+      case 's':
+      case 'S':
         carmove_signal(BACKWARD,1023);
         break;  
       case 'K':    
       case 'k':
         carmove_signal(STOP,1023);
         break;
-      case 'O':    
-      case 'o':
+      case 'E':    
+      case 'e':
         carmove_signal(FORWARD_RIGHT,1023);
         break;
-      case 'U':    
-      case 'u':
+      case 'Q':    
+      case 'q':
         carmove_signal(FORWARD_LEFT,1023);
         break;
-      case '.':
+      case 'c':
+      case 'C':
         carmove_signal(BACKWARD_RIGHT,1023);
         break;        
-      case 'M':    
-      case 'm':
+      case 'Z':    
+      case 'z':
         carmove_signal(BACKWARD_LEFT,1023);
         break;
-      case 'A':    
-      case 'a':
+      case 'l':    
+      case 'L':
         carmove_signal(TRUN_RIGHT,1023);
         break;
-      case 'D':
-      case 'd':
+      case 'J':
+      case 'j':
         carmove_signal(TRUN_LEFT,1023);
         break;
-        
-      case 'T':    
-      case 't':
-        break;   
-            
+      case 'i':
+      case 'I':   
+        pingpong_shit(clockwise, 255);
+      case 'o':
+      case 'O':   
+        pingpong_shit(off, 255);
       default:
         break;
     }
@@ -193,7 +193,4 @@ void loop(){
     signal_load_595();
 
   }
-}
-  carmove_signal(FOWARD,1023);
-  signal_load_595();
 }
