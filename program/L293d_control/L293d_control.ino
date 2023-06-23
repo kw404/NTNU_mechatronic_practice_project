@@ -49,6 +49,7 @@ int  count=0;
 int carsignal,motor_5_signal,motor_6_signal;
 int moveway[9]= { B00000000,
                   B10101010,
+<<<<<<< Updated upstream
                   B00000000,
                   B00000000,
                   B00000000,
@@ -58,6 +59,15 @@ int moveway[9]= { B00000000,
                   B00000000,
                   B00000000,
                   B00000000
+=======
+                  B10000010,
+                  B10010110,
+                  B00010100,
+                  B01010101,
+                  B01000001,
+                  B01101001,
+                  B01000001
+>>>>>>> Stashed changes
                 };
 int pingpong_state[3]{  B10,
                         B01,
@@ -81,6 +91,7 @@ void carmove_signal(int direction, int motor_speed){
   analogWrite(wheel_speed_pin ,motor_speed);
 }
 
+<<<<<<< Updated upstream
 void pingpong_shit(int state, int speed){
   motor_5_signal = pingpong_state[state];
   analogWrite(pingpong_speed_pin,speed);
@@ -91,6 +102,8 @@ void motor6(int state, int speed){
   analogWrite(motor6_speed_pin,speed);
 }
 
+=======
+>>>>>>> Stashed changes
 void print_mainMenu(){
   char print_sim_joycontroler[3][3]={
     'u', 'i', 'o',
@@ -113,6 +126,19 @@ void print_mainMenu(){
   Serial.println("//////////////////////////////////");
   Serial.print("Please enter your instruction: ");
 }
+<<<<<<< Updated upstream
+=======
+/////////////////////////////////////i2c函式//////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+void receiveEvent(int numBytes){
+  if(Wire.available()){       //判斷Wire.available()有沒有訊號
+    char c = Wire.read();     //將傳入的訊號Wire.read()指定給字串C
+    Serial.println(c);        //透過Serial印出字串C的內容
+    val = c;
+  }
+}
+>>>>>>> Stashed changes
 
 void setup(){
   Wire.begin(ARDUINO_ADDR);
@@ -121,6 +147,7 @@ void setup(){
   Serial.println("START"); 
 }
 void loop(){
+<<<<<<< Updated upstream
   print_mainMenu();
   while(1){
     if(Serial.available()!= 0){ val = Serial.read(); }
@@ -182,4 +209,7 @@ void loop(){
     signal_load_595();
 
   }
+}
+  carmove_signal(FOWARD,1023);
+  signal_load_595();
 }

@@ -504,7 +504,11 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
+<<<<<<< Updated upstream
       "step": "機電整合.step",
+=======
+      "step": "../car design/circuitPCB.step",
+>>>>>>> Stashed changes
       "vrml": ""
     },
     "page_layout_descr_file": ""
