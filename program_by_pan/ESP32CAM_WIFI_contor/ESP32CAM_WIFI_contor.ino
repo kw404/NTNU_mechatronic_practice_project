@@ -77,8 +77,8 @@ const int PWMLightChannel = 3;
 // const char* ssid = "wifi_TAHRD-503";
 // const char* password = "tahrd503";
 
-const char* ssid = "Robot13";
-const char* password = "12345678";
+const char* ssid = "310_Lab";
+const char* password = "TAHRD310";
 
 //可自訂義的訊號傳輸
 void moveCar(int inputValue)

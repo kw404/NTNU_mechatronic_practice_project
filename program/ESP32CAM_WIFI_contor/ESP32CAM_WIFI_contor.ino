@@ -46,7 +46,7 @@ Servo tiltServo;
 #define CAR_BACKWARD          's'
 #define CAR_BACKEARD_RIGHT    'c'
 #define CAR_TRUN_RIGHT        'j'
-#define CAR_TRUN_LEFT         'l'
+#define CAR_TRUN_LEFT         'l' 
 
 //Camera related constants CAM的腳位設置
 #define PWDN_GPIO_NUM     32
@@ -71,9 +71,14 @@ Servo tiltServo;
 // const char* ssid = "wifi_TAHRD-503";
 // const char* password = "tahrd503";
 
-const char* ssid = "Robot13";
-const char* password = "12345678";
+// const char* ssid = "310_Lab";
+// const char* password = "TAHRD310";
 
+const char* ssid = "123";
+const char* password = "88888888";
+
+// const char* ssid = "pan0428";
+// const char* password = "04836920";
 //可自訂義的訊號傳輸
 void moveCar(int inputValue)
 {
@@ -141,14 +146,14 @@ const char* htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
     <head>
         <!-- 下面是表達網頁的編碼 -->
         <meta charset="UTF-8"/>
-        <meta name="description"    content="這是潘鈴聲的ESP32 CAM 遙控網站"/>
+        <meta name="description"    content="這是的ESP32 CAM 遙控網站"/>
         <meta name="author"         content="潘鈴聲, 高奕弘"/>
-        <meta name="keywords"       content="潘鈴聲, arduino, ESP32 CAM, 教學"/>
+        <meta name="keywords"       content=" arduino, ESP32 CAM, 教學"/>
         <meta name="viewport"       content="width=device-width, 
                                     initial-scale=1, 
                                     maximum-scale=1, 
                                     user-scalable=no"/>
-        <title>潘鈴聲的ESP32 CAM遙控網站</title> 
+        <title>ESP32 CAM遙控網站</title> 
         <style>
         /* 小記 接下來會用到 箭頭(arrows) 按鈕(botton) 滑桿(slider) 防網頁誤觸 */
         /* 箭頭 */ 
@@ -538,6 +543,10 @@ void setup() {
   
   Serial.begin(115200);
   WiFi.softAP(ssid, password);
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   Serial.print('.');
+  //   delay(1000);
+  // }
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
   Serial.println(IP);
@@ -562,6 +571,6 @@ void loop() {
   wsCamera.cleanupClients(); 
   wsCarInput.cleanupClients(); 
   sendCameraPicture(); 
- Serial.println(WiFi.localIP());
+  // Serial.println(WiFi.localIP());
 //  Serial.printf("SPIRam Total heap %d, SPIRam Free Heap %d\n", ESP.getPsramSize(), ESP.getFreePsram());
 }

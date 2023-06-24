@@ -6,12 +6,12 @@
 
 #define motor_LF_A    0
 #define motor_LF_B    1
-#define motor_RF_A    2
-#define motor_RF_B    3
+#define motor_RF_A    3
+#define motor_RF_B    2
 #define motor_LB_A    4
 #define motor_LB_B    5
-#define motor_RB_A    6
-#define motor_RB_B    7
+#define motor_RB_A    7
+#define motor_RB_B    6
 
 #define wheel_speed_pin     3
 #define pingpong_speed_pin  10
@@ -25,13 +25,13 @@
 
 #define STOP                 0
 #define FORWARD              1
-#define FORWARD_RIGHT        2
+#define FORWARD_RIGHT        6
 #define RIGHT                3
-#define BACKWARD_RIGHT       4
+#define BACKWARD_RIGHT       8
 #define BACKWARD             5
-#define BACKWARD_LEFT        6
+#define BACKWARD_LEFT        4
 #define LEFT                 7
-#define FORWARD_LEFT         8
+#define FORWARD_LEFT         2
 #define TRUN_RIGHT           9
 #define TRUN_LEFT           10
 
@@ -69,20 +69,23 @@ int motor6_state[3]  {  B10,
                       };
 
 void signal_load_595(){
-  digitalWrite(LATCH_595, LOW); 
-  shiftOut(DATA_595, CLK_595, LSBFIRST, motor_5_signal*64+motor_6_signal*16);
+  digitalWrite(LATCH_595, LOW);
+  delay(1); 
+  shiftOut(DATA_595, CLK_595, LSBFIRST, motor_5_signal<<6 | motor_6_signal<<4);
+  delay(1);
   shiftOut(DATA_595, CLK_595, LSBFIRST, carsignal);
+  delay(1);
   digitalWrite(LATCH_595, HIGH);
-  carsignal = 0;
+  Serial.println("Done");
 }
 
 void carmove_signal(int direction, int motor_speed){
   carsignal = moveway[direction];
-  analogWrite(wheel_speed_pin ,motor_speed);
+  analogWrite(wheel_speed_pin ,255);
 }
 
 void pingpong_shit(int state, byte speed_1){
-  motor_5_signal = pingpong_state[state];
+  motor_6_signal = pingpong_state[state];
   analogWrite(10,255);
 }
 
@@ -126,71 +129,80 @@ void setup(){
   //Wire.onReceive(receiveEvent);
   Serial.begin(9600);
   Serial.println("START"); 
+
+  pinMode(CLK_595,OUTPUT);
+  pinMode(DATA_595,OUTPUT);
+  pinMode(LATCH_595,OUTPUT);
+
+  pinMode(wheel_speed_pin,OUTPUT);
+  pinMode(pingpong_speed_pin,OUTPUT);
+  pinMode(motor6_speed_pin,OUTPUT);
+
 }
 void loop(){
-
+  // carmove_signal(FORWARD,1023);
   print_mainMenu();
   while(1){
     if(Serial.available()!= 0){ val = Serial.read(); }
-    
     if(Wire.available() != 0){ val = Wire.read(); }
-
-    switch(val){
-      case 'W' :
-      case 'w' :
-        carmove_signal(FORWARD,1023);
-        break;
-      case 'A' :
-      case 'a' :
-        carmove_signal(RIGHT,1023);
-        break;
-      case 'd':
-      case 'D':
-        carmove_signal(LEFT,1023);
-        break;
-      case 's':
-      case 'S':
-        carmove_signal(BACKWARD,1023);
-        break;  
-      case 'K':    
-      case 'k':
-        carmove_signal(STOP,1023);
-        break;
-      case 'E':    
-      case 'e':
-        carmove_signal(FORWARD_RIGHT,1023);
-        break;
-      case 'Q':    
-      case 'q':
-        carmove_signal(FORWARD_LEFT,1023);
-        break;
-      case 'c':
-      case 'C':
-        carmove_signal(BACKWARD_RIGHT,1023);
-        break;        
-      case 'Z':    
-      case 'z':
-        carmove_signal(BACKWARD_LEFT,1023);
-        break;
-      case 'l':    
-      case 'L':
-        carmove_signal(TRUN_RIGHT,1023);
-        break;
-      case 'J':
-      case 'j':
-        carmove_signal(TRUN_LEFT,1023);
-        break;
-      case 'i':
-      case 'I':   
-        pingpong_shit(clockwise, 255);
-      case 'o':
-      case 'O':   
-        pingpong_shit(off, 255);
-      default:
-        break;
+    if (val != 0){
+      switch(val){
+        case 'W' :
+        case 'w' :
+          carmove_signal(FORWARD,1023);
+          break;
+        case 'A' :
+        case 'a' :
+          carmove_signal(RIGHT,1023);
+          break;
+        case 'd':
+        case 'D':
+          carmove_signal(LEFT,1023);
+          break;
+        case 's':
+        case 'S':
+          carmove_signal(BACKWARD,1023);
+          break;  
+        case 'K':    
+        case 'k':
+          carmove_signal(STOP,0);
+          break;
+        case 'E':    
+        case 'e':
+          carmove_signal(FORWARD_RIGHT,1023);
+          break;
+        case 'Q':    
+        case 'q':
+          carmove_signal(FORWARD_LEFT,1023);
+          break;
+        case 'c':
+        case 'C':
+          carmove_signal(BACKWARD_RIGHT,1023);
+          break;        
+        case 'Z':    
+        case 'z':
+          carmove_signal(BACKWARD_LEFT,1023);
+          break;
+        case 'l':    
+        case 'L':
+          carmove_signal(TRUN_RIGHT,1023);
+          break;
+        case 'J':
+        case 'j':
+          carmove_signal(TRUN_LEFT,1023);
+          break;
+        case 'i':
+        case 'I':   
+          pingpong_shit(clockwise, 255);
+        case 'o':
+        case 'O':   
+          pingpong_shit(off, 255);
+        default:
+          break;
+      }
+      Serial.println(val);
+      val = 0;
+      signal_load_595();
     }
-
-    signal_load_595();
-
   }
 }
